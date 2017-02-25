@@ -10,6 +10,8 @@ def _sanitize_url(url):
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--url", help="URL to download")
+parser.add_argument(
+  "--limit", type=int, default=0, help="Max number of articles to download")
 args = parser.parse_args()
 if not args.url:
   parser.print_help()
@@ -19,6 +21,6 @@ url = _sanitize_url(args.url)
 
 print("url: %s" % url)
 
-ebook = Ebook(url)
+ebook = Ebook(url, args.limit)
 ebook.assemble()
 print("Wrote %s to %s" % (ebook.get_title(), ebook.get_filename()))

@@ -3,7 +3,8 @@ from ebooklib import epub
 
 import utils
 
-VERBOTEN_TAGS = ['script', 'link', 'meta', 'style', 'media', 'iframe']
+VERBOTEN_TAGS = [
+  'script', 'link', 'meta', 'style', 'media', 'iframe', 'frame', 'video']
 VERBOTEN_CLASSES = ['postmetadata', 'navigation']
 VERBOTEN_IDS = ['header', 'footer', 'sidebar', 'description', 'disqus_thread']
 

@@ -7,8 +7,9 @@ from wordpress.post import WordpressPost
 import utils
 
 class Ebook(object):
-  def __init__(self, url):
+  def __init__(self, url, limit):
     self._url = url
+    self._limit = limit
     self._assembled = False
     self._cache = Cache()
     self._title = None
@@ -49,5 +50,5 @@ class Ebook(object):
     self._filename = utils.title_to_filename(self._title)
 
   def _extract_posts(self, page):
-    extractor = Extractor(page)
-    return extractor.extract()
+    extractor = Extractor(page, self._cache)
+    return extractor.extract(self._limit)
