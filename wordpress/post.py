@@ -3,6 +3,10 @@ from ebooklib import epub
 
 import utils
 
+VERBOTEN_TAGS = ['script', 'link', 'meta', 'style', 'media', 'iframe']
+VERBOTEN_CLASSES = ['postmetadata', 'navigation']
+VERBOTEN_IDS = ['header', 'footer', 'sidebar', 'description', 'disqus_thread']
+
 class WordpressPost(object):
   def __init__(self, page):
     self._soup = BeautifulSoup(page, 'html.parser')
@@ -37,9 +41,21 @@ class WordpressPost(object):
       clazz = 'entry'
 
     title = title_str.encode('utf-8')
-    content = self._soup.find(clazz).encode('utf-8')
-    chapter.content = '{title_str}{content}'.format(
-      title_str=title,
-      content=content,
-    )
+    content = self._scrub_content(self._soup.find(clazz)).encode('utf-8')
+    chapter.content = content
     return chapter
+
+  def _scrub_content(self, content):
+    tags_to_remove = []
+    for d in content.descendants:
+      if d.name in VERBOTEN_TAGS:
+        tags_to_remove.append(d)
+    for c in VERBOTEN_CLASSES:
+      tags_to_remove += content.find_all(class_=c)
+    for i in VERBOTEN_IDS:
+      tags_to_remove += content.find_all(id=i)
+
+    for d in tags_to_remove:
+      d.decompose()
+
+    return content
