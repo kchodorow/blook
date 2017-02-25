@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from cache import Cache
 from ebooklib import epub
+from wordpress.extractor import Extractor
 from wordpress.post import WordpressPost
 
 import utils
@@ -19,15 +20,19 @@ class Ebook(object):
     self._extract_title(soup)
     urls = self._extract_posts(soup)
 
-    book = epub.EpubBook()
-    book.set_title(self._title)
+    spine = [epub.EpubNcx(), epub.EpubNav()]
     for url in reversed(urls):
       page = self._cache.get(url)
       post = WordpressPost(page)
-      book.add_item(post.get_epub_chapter())
+      chapter = post.get_epub_chapter()
+      if chapter:
+        spine.append(chapter)
 
-    book.add_item(epub.EpubNcx())
-    book.add_item(epub.EpubNav())
+    book = epub.EpubBook()
+    book.set_title(self._title)
+    book.spine = spine
+    for s in spine:
+      book.add_item(s)
     epub.write_epub(self._filename, book)
     self._assembled = True;
 
@@ -40,26 +45,9 @@ class Ebook(object):
     return self._filename
 
   def _extract_title(self, page):
-    self._title = page.title.name
+    self._title = page.title.string.strip()
     self._filename = utils.title_to_filename(self._title)
 
   def _extract_posts(self, page):
-    posts = []
-    while page:
-      posts += self._extract_articles(page)
-      page = self._get_next_page(page)
-      return posts
-
-  def _extract_articles(self, page):
-    post_titles = page.find_all(class_='post-title')
-    posts = []
-    if not post_titles:
-      return posts
-    for t in post_titles:
-      full_post_link = t.find('a')
-      if full_post_link:
-        posts.append(t.href)
-    return posts
-
-  def _get_next_page(self, page):
-    return None
+    extractor = Extractor(page)
+    return extractor.extract()
