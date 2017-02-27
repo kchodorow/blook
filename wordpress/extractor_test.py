@@ -4,9 +4,17 @@ from extractor import Extractor
 import unittest
 
 class ExtractorTest(unittest.TestCase):
-  def test_extract(self):
+  def test_extract_siat(self):
     extractor = Extractor(
       self._get_soup('wordpress/test/snail.html'), TestCache())
+    urls = extractor.extract(0)
+    self.assertEqual('https://www.example.com/title1', urls[0])
+    self.assertEqual('https://www.example.com/title2', urls[1])
+    self.assertEqual('https://www.example.com/title3', urls[2])
+
+  def test_extract_veb(self):
+    extractor = Extractor(
+      self._get_soup('wordpress/test/veb.html'), TestCache())
     urls = extractor.extract(0)
     self.assertEqual('https://www.example.com/title1', urls[0])
     self.assertEqual('https://www.example.com/title2', urls[1])

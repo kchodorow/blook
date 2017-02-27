@@ -58,4 +58,5 @@ class Extractor(object):
       link = o.parent
       if link.name == 'a' and link['href']:
         page = self._cache.get(link['href'])
-        return BeautifulSoup(page, 'html.parser')
+        if page:
+          return BeautifulSoup(page, 'html.parser')
