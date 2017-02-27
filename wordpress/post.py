@@ -6,7 +6,8 @@ import utils
 VERBOTEN_TAGS = [
   'script', 'link', 'meta', 'style', 'media', 'iframe', 'frame', 'video']
 VERBOTEN_CLASSES = ['postmetadata', 'navigation']
-VERBOTEN_IDS = ['header', 'footer', 'sidebar', 'description', 'disqus_thread']
+VERBOTEN_IDS = [
+  'comments', 'header', 'footer', 'sidebar', 'description', 'disqus_thread']
 
 class WordpressPost(object):
   def __init__(self, page):

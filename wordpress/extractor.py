@@ -12,7 +12,7 @@ class Extractor(object):
   def extract(self, limit):
     if limit == 0:
       limit = sys.maxint
-    posts = []
+    urls = []
 
     if self._page.find(class_='post-title'):
       # Form is: <h1 class="post-title"><a ...>Title
@@ -21,13 +21,13 @@ class Extractor(object):
       # Form is: <div class="post"><h2><a ...>Title
       self._class = 'post'
     else:
-      return posts
+      return urls
 
     page = self._page
-    while page and len(posts) < limit:
-      posts += self._extract_articles(page)
+    while page and len(urls) < limit:
+      urls += self._extract_articles(page)
       page = self._get_next_page(page)
-    return posts[0:limit]
+    return urls[0:limit]
 
   def _extract_articles(self, page):
     post_titles = page.find_all(class_=self._class)
@@ -40,12 +40,19 @@ class Extractor(object):
         posts.append(full_post_link['href'])
     return posts
 
+  def _next_by_url(self):
+    return None
+
   def _get_next_page(self, page):
     older = page.find_all(string=re.compile('Older '))
     if not older:
       older = page.find_all(string=re.compile('Previous '))
     if not older:
-      return None
+      # Look for <link rel="next" href="url.." />
+      older = page.find_all('link', rel="next", href=True)
+    if not older:
+      # Look for literally "url/page/n+1"
+      return self._next_by_url()
 
     for o in older:
       link = o.parent
