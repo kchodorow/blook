@@ -4,6 +4,8 @@ import re
 import sys
 
 class Extractor(object):
+  """Extracts a list of URLs for individual posts."""
+
   def __init__(self, page, cache):
     self._page = page
     self._cache = cache

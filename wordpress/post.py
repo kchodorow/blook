@@ -10,6 +10,9 @@ VERBOTEN_IDS = [
   'comments', 'header', 'footer', 'sidebar', 'description', 'disqus_thread']
 
 class WordpressPost(object):
+  """Extracts the actual content of the post and removes all non-ebook
+  formatting."""
+
   def __init__(self, page):
     self._soup = BeautifulSoup(page, 'html.parser')
 
@@ -37,13 +40,12 @@ class WordpressPost(object):
     )
 
     clazz = None
-    if self._soup.find('entry-content'):
-      clazz = 'entry-content'
-    elif self._soup.find('entry'):
+    if self._soup.find(class_='entrytext'):
+      clazz = 'entrytext'
+    elif self._soup.find(class_='entry'):
       clazz = 'entry'
 
-    title = title_str.encode('utf-8')
-    content = self._scrub_content(self._soup.find(clazz)).encode('utf-8')
+    content = self._scrub_content(self._soup.find(class_=clazz)).encode('utf-8')
     chapter.content = content
     return chapter
 

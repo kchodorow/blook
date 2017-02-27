@@ -47,7 +47,7 @@ class Ebook(object):
 
   def _extract_title(self, page):
     self._title = page.title.string.strip()
-    self._filename = utils.title_to_filename(self._title)
+    self._filename = "%s.epub" % utils.title_to_filename(self._title)
 
   def _extract_posts(self, page):
     extractor = Extractor(page, self._cache)
