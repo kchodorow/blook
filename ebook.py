@@ -2,8 +2,8 @@ from bs4 import BeautifulSoup
 from cache import Cache
 from ebooklib import epub
 from filters import filter_index
-from wordpress.extractor import Extractor
-from wordpress.post import WordpressPost
+from extract.extractor import Listing
+from extract.post import Entry
 
 import utils
 
@@ -20,14 +20,14 @@ class Ebook(object):
     page = self._cache.get(self._url)
     soup = BeautifulSoup(page, 'html.parser')
     self._extract_title(soup)
-    extractor = Extractor(page, self._cache)
+    extractor = Listing(page, self._cache)
     urls = extractor.extract(self._limit, filter_index.ENTRY_LISTINGS)
 
     book = epub.EpubBook()
     spine = [epub.EpubNcx(), epub.EpubNav()]
     toc = []
     for url in reversed(urls):
-      post = WordpressPost(self._cache.get(url), filter_index.ENTRY_FILTERS)
+      post = Entry(self._cache.get(url), filter_index.ENTRY_FILTERS)
       chapter = post.get_epub_chapter()
       spine.append(chapter)
       toc.append(epub.Link(chapter.file_name, chapter.title, chapter.id))

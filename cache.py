@@ -1,6 +1,8 @@
 import glob
 import os
 import re
+import sys
+import time
 import urllib
 import urllib2
 
@@ -15,6 +17,7 @@ class Cache(object):
       self._cache_dir = '%s/.cache/blook' % home
       if not os.path.isdir(self._cache_dir):
         os.makedirs(self._cache_dir)
+      self._last_download = 0
 
     def clean(self):
       filename = "%s/%s" % (self._cache_dir, urllib.quote(self._base_url, safe=''))
@@ -23,7 +26,14 @@ class Cache(object):
         os.remove(file)
 
     def _download(self, url):
+      current_time = time.time()
+      if current_time - self._last_download < 1:
+        # Don't hammer a server
+        time.sleep(1)
+      self._last_download = current_time
+
       try:
+        sys.stdout.write('Downloading %s...' % url)
         request = urllib2.Request(url)
         request.add_header('User-Agent', USER_AGENT)
         response = urllib2.urlopen(request)
@@ -31,6 +41,7 @@ class Cache(object):
       except urllib2.HTTPError, e:
         print(e.reason)
         raise e
+      sys.stdout.write(u'\u2714\n')
       return html
 
     # Visible for testing.

@@ -10,7 +10,7 @@ VERBOTEN_CLASSES = ['postmeta', 'postmetadata', 'navigation']
 VERBOTEN_IDS = [
   'comments', 'header', 'footer', 'sidebar', 'description', 'disqus_thread']
 
-class WordpressPost(object):
+class Entry(object):
   """Extracts the actual content of the post and removes all non-ebook
   formatting."""
 

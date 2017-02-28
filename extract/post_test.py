@@ -1,13 +1,13 @@
-from post import WordpressPost
+from post import Entry
 
 import ebook
 import unittest
 
 class PostTest(unittest.TestCase):
   def test_extract_siat(self):
-    with open('wordpress/test/snail_entry.html', 'r') as fh:
+    with open('extract/test/snail_entry.html', 'r') as fh:
       page = fh.read()
-    post = WordpressPost(page, ebook.ENTRY_FILTERS)
+    post = Entry(page, ebook.ENTRY_FILTERS)
     chapter = post.get_epub_chapter()
     self.assertEquals('Title 1', chapter.title)
     self.assertEquals('Title-1.xhtml', chapter.file_name)

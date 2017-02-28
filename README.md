@@ -43,7 +43,7 @@ Alternatively, please feel free to add a new blog format:
 * Add your filter to [the filter
   list](https://github.com/kchodorow/blook/tree/master/filters/filter_index.py).
 * Add some tests to `filters/your_filter_test.py` following the
-  `wordpress/extractor_test.py` model. Create test HTML files as needed in
+  `extract/extractor_test.py` model. Create test HTML files as needed in
   `filters/test_data/`. TODO: come up with more comprehensive
   template-specific tests and put them in the filters/ directory.
 * Make sure your test passes by running `python -m filters.your_filter_test`.
