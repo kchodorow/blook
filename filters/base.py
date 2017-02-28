@@ -30,7 +30,6 @@ class NotFoundError(Exception):
 
 class FilterNotFoundError(Exception):
   def __init__(self, msg, soup):
-    super(FilterNotFoundError, self).__init__(
-      '%s, content written to unknown.html' % msg)
-    with open('unknown.html', 'w') as fh:
+    super(FilterNotFoundError, self).__init__(msg)
+    with open('unparsable.html', 'w') as fh:
       fh.write(soup.encode('utf-8'))

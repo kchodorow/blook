@@ -4,7 +4,7 @@ from filters import base
 import logging
 import sys
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger('extract.extractor.Listing')
 
 class Listing(object):

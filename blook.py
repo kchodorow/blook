@@ -32,7 +32,17 @@ class Blook(object):
     try:
       ebook.assemble()
     except base.FilterNotFoundError, e:
-      print(e.message)
+      print("""
+ERROR: Blook could not figure out how to parse {url}.
+
+To add support for downloading this blog, please create an issue at
+https://github.com/kchodorow/blook/issues with the following title:
+
+    {msg} for {url}
+
+Blook created a file called 'unparsable.html' in this directory, which contains
+the HTML it didn't recognize. Please attach it to the GitHub issue.
+""".format(url=url, msg=e.message))
       return
 
     print("Wrote %s to %s" % (ebook.get_title(), ebook.get_filename()))
