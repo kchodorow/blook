@@ -35,15 +35,16 @@ class Ebook(object):
     urls = extractor.extract(self._limit, ENTRY_LISTINGS)
 
     spine = [epub.EpubNcx(), epub.EpubNav()]
+    toc = []
     for url in reversed(urls):
       page = self._cache.get(url)
       post = WordpressPost(page, ENTRY_FILTERS)
       chapter = post.get_epub_chapter()
       if chapter:
         spine.append(chapter)
-
+        toc.append(epub.Link(chapter.file_name, chapter.title, chapter.id))
     book = epub.EpubBook()
-    book.set_title(self._title)
+    book.toc = toc
     book.spine = spine
     for s in spine:
       book.add_item(s)

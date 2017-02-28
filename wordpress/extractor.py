@@ -14,22 +14,22 @@ class Extractor(object):
     if limit == 0:
       limit = sys.maxint
     listing = None
+    page = BeautifulSoup(self._page, 'html.parser')
     for l in filters:
-      if l.applies(self._page):
+      if l.applies(page):
         listing = l
         break
     if not listing:
-      raise ListingNotFoundError(self._page)
+      raise ListingNotFoundError(page)
 
-    page = self._page
     urls = []
     while page and len(urls) < limit:
       urls += listing.extract_urls(page)
       next_listing = listing.next_page_url(page)
-      listing = self._cache.get(next_listing)
+      listing_page = self._cache.get(next_listing)
       page = None
-      if listing:
-        page = BeautifulSoup(listing, 'html.parser')
+      if listing_page:
+        page = BeautifulSoup(listing_page, 'html.parser')
     return urls[0:limit]
 
 class ListingNotFoundError(Exception):

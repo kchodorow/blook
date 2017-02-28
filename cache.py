@@ -4,6 +4,8 @@ import urllib2
 
 from urllib2 import URLError
 
+USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
+
 class Cache(object):
     def __init__(self):
         home = os.environ['HOME']
@@ -13,10 +15,13 @@ class Cache(object):
 
     def _download(self, url):
         try:
-            response = urllib2.urlopen(url)
+            request = urllib2.Request(url)
+            request.add_header('User-Agent', USER_AGENT)
+            response = urllib2.urlopen(request)
             html = response.read()
-        except URLError, e:
-            print(e)
+        except urllib2.HTTPError, e:
+            print(e.reason)
+            raise e
         return html
 
     def get(self, url):

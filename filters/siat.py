@@ -14,11 +14,13 @@ class SiatEntry(BaseEntry):
     return title_link.get_text()
 
   def extract_content(self, soup):
-    return soup.find(class_='entrytext')
+    return soup.find(class_='post')
+
+PREVIOUS_RE = re.compile('Previous ')
 
 class SiatListing(BaseListing):
   def applies(self, soup):
-    return soup.find(class_='post')
+    return soup.find(class_='post') and soup.find(string=PREVIOUS_RE)
 
   def extract_urls(self, soup):
     post_titles = soup.find_all(class_='post')
@@ -32,5 +34,5 @@ class SiatListing(BaseListing):
     return urls
 
   def next_page_url(self, soup):
-    prev = soup.find(string=re.compile('Previous '))
+    prev = soup.find(string=PREVIOUS_RE)
     return prev.parent['href']

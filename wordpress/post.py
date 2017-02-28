@@ -31,6 +31,7 @@ class WordpressPost(object):
     content = tmpl.extract_content(self._soup)
 
     chapter = epub.EpubHtml(
+      uid=utils.generate_uid(title),
       title=title,
       file_name='%s.xhtml' % utils.title_to_filename(title)
     )

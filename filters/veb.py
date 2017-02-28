@@ -4,7 +4,7 @@ import re
 
 class VebEntry(BaseEntry):
   def applies(self, soup):
-    return soup.find(class_='post-title') and soup.find(class_='entry-content')
+    return soup.find(class_='post-title') and soup.find(class_='post-content')
 
   def extract_title(self, soup):
     post = soup.find(class_='post-title')
@@ -14,7 +14,7 @@ class VebEntry(BaseEntry):
     return title_link.get_text()
 
   def extract_content(self, soup):
-    return soup.find(class_='entry-content')
+    return soup.find(class_='post-content')
 
 class VebListing(BaseListing):
   def applies(self, soup):
@@ -36,6 +36,6 @@ class VebListing(BaseListing):
     if not nav:
       return None
     current_page = nav.find(class_='current')
-    if not current_page or not current_page.next_sibling:
-      return None
-    return current_page.next_sibling['href']
+    for sibling in current_page.next_siblings:
+      if sibling.name == 'a':
+        return sibling['href']
