@@ -13,39 +13,29 @@ class WordpressPost(object):
   """Extracts the actual content of the post and removes all non-ebook
   formatting."""
 
-  def __init__(self, page):
+  def __init__(self, page, filters):
     self._soup = BeautifulSoup(page, 'html.parser')
+    self._filters = filters
 
   def get_epub_chapter(self):
-    post = self._soup.find(class_='post')
-    if not post:
-      post = self._soup.find(class_='post-title')
-    if not post:
-      # TODO
-      return None
+    tmpl = None
+    for f in self._filters:
+      if f.applies(self._soup):
+        tmpl = f
+        break
 
-    title_link = post.find('a')
-    if not title_link:
-      print('post: %s' % post.prettify())
-      return None
+    if not tmpl:
+      raise EntryFilterNotFoundError(self._soup)
 
-    title_str = title_link.string
-    if not title_str:
-      print('ln: %s' % title_link.prettify())
-      return None
+    title = tmpl.extract_title(self._soup)
+    content = tmpl.extract_content(self._soup)
 
     chapter = epub.EpubHtml(
-      title=title_str,
-      file_name='%s.xhtml' % utils.title_to_filename(title_str)
+      title=title,
+      file_name='%s.xhtml' % utils.title_to_filename(title)
     )
 
-    clazz = None
-    if self._soup.find(class_='entrytext'):
-      clazz = 'entrytext'
-    elif self._soup.find(class_='entry'):
-      clazz = 'entry'
-
-    content = self._scrub_content(self._soup.find(class_=clazz)).encode('utf-8')
+    content = self._scrub_content(content).encode('utf-8')
     chapter.content = content
     return chapter
 
@@ -63,3 +53,8 @@ class WordpressPost(object):
       d.decompose()
 
     return content
+
+class EntryFilterNotFoundError(Exception):
+  def __init__(self, soup):
+    super(EntryFilterNotFoundError, self).__init__(
+      'No filter found for %s' % soup.prettify())

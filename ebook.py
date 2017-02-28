@@ -1,10 +1,15 @@
 from bs4 import BeautifulSoup
 from cache import Cache
 from ebooklib import epub
+from filters.siat import Siat
 from wordpress.extractor import Extractor
 from wordpress.post import WordpressPost
 
 import utils
+
+ENTRY_FILTERS = [
+  Siat(),
+]
 
 class Ebook(object):
   def __init__(self, url, limit):
@@ -24,7 +29,7 @@ class Ebook(object):
     spine = [epub.EpubNcx(), epub.EpubNav()]
     for url in reversed(urls):
       page = self._cache.get(url)
-      post = WordpressPost(page)
+      post = WordpressPost(page, ENTRY_FILTERS)
       chapter = post.get_epub_chapter()
       if chapter:
         spine.append(chapter)
