@@ -1,11 +1,12 @@
 from bs4 import BeautifulSoup
 from ebooklib import epub
+from filters import base
 
 import utils
 
 VERBOTEN_TAGS = [
   'script', 'link', 'meta', 'style', 'media', 'iframe', 'frame', 'video']
-VERBOTEN_CLASSES = ['postmetadata', 'navigation']
+VERBOTEN_CLASSES = ['postmeta', 'postmetadata', 'navigation']
 VERBOTEN_IDS = [
   'comments', 'header', 'footer', 'sidebar', 'description', 'disqus_thread']
 
@@ -73,7 +74,7 @@ class WordpressPost(object):
   def _get_img_src(self, url):
     return url.strip().replace(':', '_c').replace('/', '_s').replace('&', '_a').replace('?', '_q')
 
-class EntryFilterNotFoundError(Exception):
+class EntryFilterNotFoundError(base.FilterNotFoundError):
   def __init__(self, soup):
     super(EntryFilterNotFoundError, self).__init__(
-      'No filter found for %s' % soup.prettify())
+      'No entry filter found', soup)

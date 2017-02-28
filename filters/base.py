@@ -27,3 +27,10 @@ class NotFoundError(Exception):
   def __init__(self, element, soup):
     super(NotFoundError, self).__init__(
       'Expected %s, but not found (%s)' % (element, soup.prettify()))
+
+class FilterNotFoundError(Exception):
+  def __init__(self, msg, soup):
+    super(FilterNotFoundError, self).__init__(
+      '%s, content written to unknown.html' % msg)
+    with open('unknown.html', 'w') as fh:
+      fh.write(soup.encode('utf-8'))

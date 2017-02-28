@@ -4,7 +4,7 @@ import re
 
 class SiatEntry(BaseEntry):
   def applies(self, soup):
-    return soup.find(class_='post') and soup.find(class_='entrytext')
+    return soup.find(class_='post')
 
   def extract_title(self, soup):
     post = soup.find(class_='post')

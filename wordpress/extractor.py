@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+from filters import base
 
 import sys
 
@@ -27,9 +28,10 @@ class Extractor(object):
       urls += listing.extract_urls(page)
       next_listing = listing.next_page_url(page)
       page = None
-      listing_page = self._cache.get(next_listing)
-      if listing_page:
-        page = BeautifulSoup(listing_page, 'html.parser')
+      if next_listing:
+        listing_page = self._cache.get(next_listing)
+        if listing_page:
+          page = BeautifulSoup(listing_page, 'html.parser')
     return urls[0:limit]
 
   def _get_full(self, next_listing, url):
@@ -38,7 +40,7 @@ class Extractor(object):
     return next_listing
 
 
-class ListingNotFoundError(Exception):
+class ListingNotFoundError(base.FilterNotFoundError):
   def __init__(self, soup):
     super(ListingNotFoundError, self).__init__(
-      'No filter found for %s' % soup.prettify())
+      'No listing filter found', soup)

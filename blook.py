@@ -1,6 +1,7 @@
 import argparse
 from cache import Cache
 from ebook import Ebook
+from filters import base
 
 class Blook(object):
   def _sanitize_url(self, url):
@@ -12,7 +13,7 @@ class Blook(object):
 
   def run(self):
     parser = argparse.ArgumentParser()
-    parser.add_argument("--url", help="URL to download")
+    parser.add_argument("url", help="URL to download")
     parser.add_argument(
       "--limit", type=int, default=0, help="Max number of articles to download")
     parser.add_argument('--clean_cache', action='store_true')
@@ -28,7 +29,12 @@ class Blook(object):
       return
 
     ebook = Ebook(url, args.limit)
-    ebook.assemble()
+    try:
+      ebook.assemble()
+    except base.FilterNotFoundError, e:
+      print(e.message)
+      return
+
     print("Wrote %s to %s" % (ebook.get_title(), ebook.get_filename()))
 
 if __name__ == '__main__':
