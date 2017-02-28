@@ -39,8 +39,5 @@ class TestCache(object):
   def get(self, url):
     return None
 
-  def put(self, url, content):
-    pass
-
 if __name__ == '__main__':
   unittest.main()

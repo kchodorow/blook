@@ -16,8 +16,8 @@ class WordpressPost(object):
   def __init__(self, page, filters):
     self._soup = BeautifulSoup(page, 'html.parser')
     self._filters = filters
+    self._img_urls = []
 
-  def get_epub_chapter(self):
     tmpl = None
     for f in self._filters:
       if f.applies(self._soup):
@@ -27,18 +27,21 @@ class WordpressPost(object):
     if not tmpl:
       raise EntryFilterNotFoundError(self._soup)
 
-    title = tmpl.extract_title(self._soup)
+    self._title = tmpl.extract_title(self._soup)
     content = tmpl.extract_content(self._soup)
+    self._content = self._scrub_content(content).encode('utf-8')
 
+  def get_epub_chapter(self):
     chapter = epub.EpubHtml(
-      uid=utils.generate_uid(title),
-      title=title,
-      file_name='%s.xhtml' % utils.title_to_filename(title)
+      uid=utils.generate_uid(self._title),
+      title=self._title,
+      file_name='%s.xhtml' % utils.title_to_filename(self._title)
     )
-
-    content = self._scrub_content(content).encode('utf-8')
-    chapter.content = content
+    chapter.content = self._content
     return chapter
+
+  def get_image_urls(self):
+    return self._img_urls
 
   def _scrub_content(self, content):
     tags_to_remove = []
@@ -53,7 +56,22 @@ class WordpressPost(object):
     for d in tags_to_remove:
       d.decompose()
 
+    if content.name == 'img':
+      self._add_img(content)
+    else:
+      imgs = content.find_all('img')
+      for img in imgs:
+        self._add_img(img)
+
     return content
+
+  def _add_img(self, img):
+    img_src = self._get_img_src(img['src'])
+    self._img_urls.append((img['src'], img_src))
+    img['src'] = img_src
+
+  def _get_img_src(self, url):
+    return url.strip().replace(':', '_c').replace('/', '_s').replace('&', '_a').replace('?', '_q')
 
 class EntryFilterNotFoundError(Exception):
   def __init__(self, soup):
