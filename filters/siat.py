@@ -4,6 +4,7 @@ import re
 
 PREVIOUS_RE = re.compile('Previous ')
 OLDER_RE = re.compile('Older ')
+CONTINUE_RE = re.compile('continue reading')
 
 class SiatEntry(BaseEntry):
   def applies(self, soup):
@@ -50,3 +51,31 @@ class AvcListing(SiatListing):
     while parent and not parent.name == 'a':
       parent = parent.parent
     return parent['href']
+
+class MmmListing(SiatListing):
+  """Based on Mr. Money Moustache."""
+
+  def applies(self, soup):
+    return soup.find('article') and soup.find(string=PREVIOUS_RE)
+
+  def extract_urls(self, soup):
+    articles = soup.find_all('article')
+    urls = []
+    for t in articles:
+      continue_reading = t.find(string=CONTINUE_RE)
+      if not continue_reading:
+        continue
+      urls.append(continue_reading.parent['href'])
+    return urls
+
+class MmmEntry(BaseEntry):
+  """Based on Mr. Money Moustache."""
+
+  def applies(self, soup):
+    return soup.find(class_='headline') and soup.find(class_='post_content')
+
+  def extract_title(self, soup):
+    return soup.find(class_='headline').get_text()
+
+  def extract_content(self, soup):
+    return soup.find(class_='post_content')
