@@ -1,14 +1,21 @@
 from bs4 import BeautifulSoup
 from cache import Cache
 from ebooklib import epub
-from filters.siat import Siat
+from filters.siat import SiatEntry, SiatListing
+from filters.veb import VebEntry, VebListing
 from wordpress.extractor import Extractor
 from wordpress.post import WordpressPost
 
 import utils
 
 ENTRY_FILTERS = [
-  Siat(),
+  SiatEntry(),
+  VebEntry(),
+]
+
+ENTRY_LISTINGS = [
+  SiatListing(),
+  VebListing(),
 ]
 
 class Ebook(object):
@@ -24,7 +31,8 @@ class Ebook(object):
     page = self._cache.get(self._url)
     soup = BeautifulSoup(page, 'html.parser')
     self._extract_title(soup)
-    urls = self._extract_posts(soup)
+    extractor = Extractor(page, self._cache)
+    urls = extractor.extract(self._limit, ENTRY_LISTINGS)
 
     spine = [epub.EpubNcx(), epub.EpubNav()]
     for url in reversed(urls):
@@ -53,7 +61,3 @@ class Ebook(object):
   def _extract_title(self, page):
     self._title = page.title.string.strip()
     self._filename = "%s.epub" % utils.title_to_filename(self._title)
-
-  def _extract_posts(self, page):
-    extractor = Extractor(page, self._cache)
-    return extractor.extract(self._limit)
