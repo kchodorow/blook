@@ -22,7 +22,7 @@ class Cache(object):
     def clean(self):
       filename = "%s/%s" % (self._cache_dir, urllib.quote(self._base_url, safe=''))
       for file in glob.glob('%s*' % filename):
-        print('Deleting %s' % file)
+        print('Deleting %s' % urllib.unquote(file))
         os.remove(file)
 
     def _download(self, url):
@@ -33,7 +33,7 @@ class Cache(object):
       self._last_download = current_time
 
       try:
-        sys.stdout.write('Downloading %s...' % url)
+        sys.stdout.write('Downloading %s... ' % url)
         request = urllib2.Request(url)
         request.add_header('User-Agent', USER_AGENT)
         response = urllib2.urlopen(request)

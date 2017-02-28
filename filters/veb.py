@@ -18,7 +18,7 @@ class VebEntry(BaseEntry):
 
 class VebListing(BaseListing):
   def applies(self, soup):
-    return soup.find(class_='post-title')
+    return soup.find(class_='post-title') and soup.find(class_='pagenav')
 
   def extract_urls(self, soup):
     post_titles = soup.find_all(class_='post-title')

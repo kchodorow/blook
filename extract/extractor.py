@@ -1,7 +1,11 @@
 from bs4 import BeautifulSoup
 from filters import base
 
+import logging
 import sys
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger('extract.extractor.Listing')
 
 class Listing(object):
   """Extracts a list of URLs for individual posts."""
@@ -9,7 +13,6 @@ class Listing(object):
   def __init__(self, page, cache):
     self._page = page
     self._cache = cache
-    self._class = None
 
   def extract(self, limit, filters):
     if limit == 0:
@@ -19,6 +22,7 @@ class Listing(object):
     for l in filters:
       if l.applies(page):
         listing = l
+        logging.debug('Chose listing filter %s', type(listing).__name__)
         break
     if not listing:
       raise ListingNotFoundError(page)
@@ -26,19 +30,13 @@ class Listing(object):
     urls = []
     while page and len(urls) < limit:
       urls += listing.extract_urls(page)
-      next_listing = listing.next_page_url(page)
+      next_url = listing.next_page_url(page)
       page = None
-      if next_listing:
-        listing_page = self._cache.get(next_listing)
+      if next_url:
+        listing_page = self._cache.get(next_url)
         if listing_page:
           page = BeautifulSoup(listing_page, 'html.parser')
     return urls[0:limit]
-
-  def _get_full(self, next_listing, url):
-    if not next_listing.startswith(url):
-      next_listing = "%s/%s" % (url, next_listing)
-    return next_listing
-
 
 class ListingNotFoundError(base.FilterNotFoundError):
   def __init__(self, soup):

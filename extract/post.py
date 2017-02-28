@@ -6,7 +6,7 @@ import utils
 
 VERBOTEN_TAGS = [
   'script', 'link', 'meta', 'style', 'media', 'iframe', 'frame', 'video']
-VERBOTEN_CLASSES = ['postmeta', 'postmetadata', 'navigation']
+VERBOTEN_CLASSES = ['postmeta', 'postmetadata', 'postnavigation', 'navigation']
 VERBOTEN_IDS = [
   'comments', 'header', 'footer', 'sidebar', 'description', 'disqus_thread']
 

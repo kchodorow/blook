@@ -2,6 +2,9 @@ from filters.base import BaseEntry, BaseListing, NotFoundError
 
 import re
 
+PREVIOUS_RE = re.compile('Previous ')
+OLDER_RE = re.compile('Older ')
+
 class SiatEntry(BaseEntry):
   def applies(self, soup):
     return soup.find(class_='post')
@@ -15,8 +18,6 @@ class SiatEntry(BaseEntry):
 
   def extract_content(self, soup):
     return soup.find(class_='post')
-
-PREVIOUS_RE = re.compile('Previous ')
 
 class SiatListing(BaseListing):
   def applies(self, soup):
@@ -36,3 +37,16 @@ class SiatListing(BaseListing):
   def next_page_url(self, soup):
     prev = soup.find(string=PREVIOUS_RE)
     return prev.parent['href']
+
+class AvcListing(SiatListing):
+  """Based on avc.com."""
+
+  def applies(self, soup):
+    return soup.find(class_='post') and soup.find(string=OLDER_RE)
+
+  def next_page_url(self, soup):
+    prev = soup.find(string=OLDER_RE)
+    parent = prev.parent
+    while parent and not parent.name == 'a':
+      parent = parent.parent
+    return parent['href']
