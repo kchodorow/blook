@@ -1,5 +1,5 @@
 import argparse
-from cache import Cache
+from cache import Cache, PageNotFoundError
 from ebook import Ebook
 from filters import base
 
@@ -28,9 +28,10 @@ class Blook(object):
       Cache(url).clean()
       return
 
-    ebook = Ebook(url, args.limit)
+    ebook = Ebook(url, args.limit, Cache(url))
     try:
       ebook.assemble()
+      print("Wrote %s to %s" % (ebook.get_title(), ebook.get_filename()))
     except base.FilterNotFoundError, e:
       print("""
 ERROR: Blook could not figure out how to parse {url}.
@@ -43,9 +44,9 @@ https://github.com/kchodorow/blook/issues with the following title:
 Blook created a file called 'unparsable.html' in this directory, which contains
 the HTML it didn't recognize. Please attach it to the GitHub issue.
 """.format(url=url, msg=e.message))
-      return
+    except PageNotFoundError, e:
+      print(e.message)
 
-    print("Wrote %s to %s" % (ebook.get_title(), ebook.get_filename()))
 
 if __name__ == '__main__':
   Blook().run()

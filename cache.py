@@ -81,3 +81,8 @@ class Cache(object):
           mode = 'wb' if binary else 'w'
           cache_file.write(html)
       return html
+
+class PageNotFoundError(Exception):
+  def __init__(self, url):
+    super(PageNotFoundError, self).__init__(
+      'Could not fetch page %s', url)

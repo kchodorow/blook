@@ -31,6 +31,8 @@ class Listing(object):
     count = 0
     while page and len(urls) < limit and count < limit:
       urls += listing.extract_urls(page)
+      if len(urls) >= limit:
+        break
       next_url = listing.next_page_url(page)
       page = None
       if next_url:
