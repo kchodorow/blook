@@ -28,7 +28,8 @@ class Listing(object):
       raise ListingNotFoundError(page)
 
     urls = []
-    while page and len(urls) < limit:
+    count = 0
+    while page and len(urls) < limit and count < limit:
       urls += listing.extract_urls(page)
       next_url = listing.next_page_url(page)
       page = None
@@ -36,6 +37,9 @@ class Listing(object):
         listing_page = self._cache.get(next_url)
         if listing_page:
           page = BeautifulSoup(listing_page, 'html.parser')
+      # Safety valve so it doesn't run forever if there's a bug and it can't
+      # extract any URLs.
+      count = count + 1
     return urls[0:limit]
 
 class ListingNotFoundError(base.FilterNotFoundError):

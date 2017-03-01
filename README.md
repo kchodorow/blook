@@ -37,14 +37,12 @@ issue](https://github.com/kchodorow/blook/issues).
 Alternatively, please feel free to add a new blog format:
 
 * Add a file to [filters/](https://github.com/kchodorow/blook/tree/master/filters).
-* Extend `base.BaseEntry` and `base.BaseListing` with the appropriate code (use
-  [siat.py](https://github.com/kchodorow/blook/tree/master/filters/siat.py) as
-  an example).
+* Extend `base.BaseEntry` and `base.BaseListing` with the appropriate code (look
+  at [siat.py](https://github.com/kchodorow/blook/tree/master/filters/siat.py)
+  for examples).
 * Add your filter to [the filter
   list](https://github.com/kchodorow/blook/tree/master/filters/filter_index.py).
 * Add some tests to `filters/your_filter_test.py` following the
-  `extract/extractor_test.py` model. Create test HTML files as needed in
-  `filters/test_data/`. TODO: come up with more comprehensive
-  template-specific tests and put them in the filters/ directory.
+  `filters/nhl_test.py` model.
 * Make sure your test passes by running `python -m filters.your_filter_test`.
 * Submit a pull request!

@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from cache import Cache
 from ebooklib import epub
 from filters import filter_index
-from extract.extractor import Listing
+from extract.extractor import Listing, ListingNotFoundError
 from extract.post import Entry
 
 import utils
@@ -17,12 +17,7 @@ class Ebook(object):
     self._filename = None
 
   def assemble(self):
-    page = self._cache.get(self._url)
-    soup = BeautifulSoup(page, 'html.parser')
-    self._extract_title(soup)
-    extractor = Listing(page, self._cache)
-    urls = extractor.extract(self._limit, filter_index.ENTRY_LISTINGS)
-
+    urls = self._get_urls()
     book = epub.EpubBook()
     spine = [epub.EpubNcx(), epub.EpubNav()]
     toc = []
@@ -52,6 +47,31 @@ class Ebook(object):
   def get_filename(self):
     assert self._assembled
     return self._filename
+
+  def _get_urls_under_url(self, url):
+    page = self._cache.get(url)
+    soup = BeautifulSoup(page, 'html.parser')
+    extractor = Listing(page, self._cache)
+    urls = extractor.extract(self._limit, filter_index.ENTRY_LISTINGS)
+    self._extract_title(soup)
+    return urls
+
+  def _get_urls(self):
+    original_e = None
+    try:
+      return self._get_urls_under_url(self._url)
+    except ListingNotFoundError, e:
+      if re.matches('/blog/?$', self._url):
+        raise e
+      original_e = e
+
+    # Otherwise, retry with /blog appended to the URL.
+    try:
+      return self._get_urls_under_url('%s/blog' % self._url)
+    except ListingNotFoundError, e:
+      # But don't throw the error with /blog appended, as that would be
+      # confusing.
+      raise original_e
 
   def _extract_title(self, page):
     self._title = page.title.string.strip()

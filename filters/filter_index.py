@@ -1,4 +1,4 @@
-from filters.siat import SiatEntry, SiatListing, AvcListing, MmmListing, MmmEntry
+from filters.siat import SiatEntry, SiatListing, AvcListing, MmmListing, MmmEntry, NhlListing
 from filters.ssss import SsssEntry, SsssListing
 from filters.veb import VebEntry, VebListing
 
@@ -15,4 +15,5 @@ ENTRY_LISTINGS = [
   SiatListing(),
   SsssListing(),
   VebListing(),
+  NhlListing(), # Uses 'Next Page' for TOC, so must be after 'Previous'.
 ]

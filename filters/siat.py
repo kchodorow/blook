@@ -5,6 +5,7 @@ import re
 PREVIOUS_RE = re.compile('Previous ')
 OLDER_RE = re.compile('Older ')
 CONTINUE_RE = re.compile('continue reading')
+NEXT_RE = re.compile('Next ')
 
 class SiatEntry(BaseEntry):
   def applies(self, soup):
@@ -20,7 +21,7 @@ class SiatEntry(BaseEntry):
   def extract_content(self, soup):
     return soup.find(class_='post')
 
-class SiatListing(BaseListing):
+class PostListing(BaseListing):
   def applies(self, soup):
     return soup.find(class_='post') and soup.find(string=PREVIOUS_RE)
 
@@ -35,15 +36,19 @@ class SiatListing(BaseListing):
         urls.append(full_post_link['href'])
     return urls
 
+class SiatListing(PostListing):
+  def applies(self, soup):
+    return PostListing.applies(self, soup) and soup.find(string=PREVIOUS_RE)
+
   def next_page_url(self, soup):
     prev = soup.find(string=PREVIOUS_RE)
     return prev.parent['href']
 
-class AvcListing(SiatListing):
+class AvcListing(PostListing):
   """Based on avc.com."""
 
   def applies(self, soup):
-    return soup.find(class_='post') and soup.find(string=OLDER_RE)
+    return PostListing.applies(self, soup) and soup.find(string=OLDER_RE)
 
   def next_page_url(self, soup):
     prev = soup.find(string=OLDER_RE)
@@ -79,3 +84,24 @@ class MmmEntry(BaseEntry):
 
   def extract_content(self, soup):
     return soup.find(class_='post_content')
+
+class NhlListing(BaseListing):
+  def applies(self, soup):
+    return soup.find('article') and soup.find(string=NEXT_RE)
+
+  def extract_urls(self, soup):
+    articles = soup.find_all('article')
+    urls = []
+    for a in articles:
+      heading = a.find('h2')
+      if not heading:
+        continue
+      link = heading.find('a')
+      if not link:
+        continue
+      urls.append(link['href'])
+    return urls
+
+  def next_page_url(self, soup):
+    prev = soup.find(string=NEXT_RE)
+    return prev.parent['href']
