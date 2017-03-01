@@ -52,6 +52,8 @@ class AvcListing(PostListing):
 
   def next_page_url(self, soup):
     prev = soup.find(string=OLDER_RE)
+    if not prev:
+      return None
     parent = prev.parent
     while parent and not parent.name == 'a':
       parent = parent.parent

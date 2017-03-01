@@ -33,9 +33,13 @@ class Ebook(object):
       for url, filename in post.get_image_urls():
         img = epub.EpubImage()
         img.file_name = filename
-        img.content = self._cache.get(url, binary=True)
-        img.media_type = 'image/jpeg'
-        book.add_item(img)
+        try:
+          img.content = self._cache.get(url, binary=True)
+          img.media_type = 'image/jpeg'
+          book.add_item(img)
+        except PageNotFoundError, e:
+          # Ignored, just skip the image.
+          pass
 
     book.toc = toc
     book.spine = spine
