@@ -23,12 +23,13 @@ class SiatEntry(BaseEntry):
 
 class PostListing(BaseListing):
   def applies(self, soup):
-    return soup.find(class_='post') and soup.find(string=PREVIOUS_RE)
+    return soup.find(class_='post')
 
   def extract_urls(self, soup):
     post_titles = soup.find_all(class_='post')
-    if not post_titles:
-      raise NotFoundError('class="post"', soup)
+    return self._extract_urls_helper(post_titles)
+
+  def _extract_urls_helper(self, post_titles):
     urls = []
     for t in post_titles:
       full_post_link = t.find('a', href=True)
@@ -42,13 +43,21 @@ class SiatListing(PostListing):
 
   def next_page_url(self, soup):
     prev = soup.find(string=PREVIOUS_RE)
+    while prev.parent and not prev.parent.name == 'a':
+      prev = prev.parent
+    if not prev.parent:
+      raise NotFoundException('a', soup)
     return prev.parent['href']
 
 class AvcListing(PostListing):
   """Based on avc.com."""
 
   def applies(self, soup):
-    return PostListing.applies(self, soup) and soup.find(string=OLDER_RE)
+    return soup.find('h2', class_='post-title') and soup.find(string=OLDER_RE)
+
+  def extract_urls(self, soup):
+    post_titles = soup.find_all('h2', class_='post-title')
+    return PostListing._extract_urls_helper(self, post_titles)
 
   def next_page_url(self, soup):
     prev = soup.find(string=OLDER_RE)
@@ -107,3 +116,22 @@ class NhlListing(BaseListing):
   def next_page_url(self, soup):
     prev = soup.find(string=NEXT_RE)
     return prev.parent['href']
+
+class LackhandListing(AvcListing):
+  def applies(self, soup):
+    return PostListing.applies(self, soup) and \
+      soup.find('h2', class_='entry-title') and soup.find(string=OLDER_RE)
+
+  def extract_urls(self, soup):
+    post_titles = soup.find_all('h2', class_='entry-title')
+    return PostListing._extract_urls_helper(self, post_titles)
+
+class LackhandEntry(BaseEntry):
+  def applies(self, soup):
+    return soup.find(id='content') and soup.find(class_='entry-title')
+
+  def extract_title(self, soup):
+    return soup.find(class_='entry-title').get_text()
+
+  def extract_content(self, soup):
+    return soup.find(class_='entry')

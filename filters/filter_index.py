@@ -1,8 +1,9 @@
-from filters.siat import SiatEntry, SiatListing, AvcListing, MmmListing, MmmEntry, NhlListing
+from filters.siat import SiatEntry, SiatListing, AvcListing, MmmListing, MmmEntry, NhlListing, LackhandEntry, LackhandListing
 from filters.ssss import SsssEntry, SsssListing
 from filters.veb import VebEntry, VebListing
 
 ENTRY_FILTERS = [
+  LackhandEntry(),
   MmmEntry(),
   SiatEntry(),
   SsssEntry(),
@@ -11,6 +12,7 @@ ENTRY_FILTERS = [
 
 ENTRY_LISTINGS = [
   AvcListing(),
+  LackhandListing(),
   MmmListing(),
   SiatListing(),
   SsssListing(),

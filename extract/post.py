@@ -6,9 +6,22 @@ import utils
 
 VERBOTEN_TAGS = [
   'script', 'link', 'meta', 'style', 'media', 'iframe', 'frame', 'video']
-VERBOTEN_CLASSES = ['postmeta', 'postmetadata', 'postnavigation', 'navigation']
+VERBOTEN_CLASSES = [
+  'postmeta',
+  'postmetadata',
+  'postnavigation',
+  'navigation',
+  'wpcnt',  # This seems to be some sort of Wordpress metadata field.
+]
 VERBOTEN_IDS = [
-  'comments', 'header', 'footer', 'sidebar', 'description', 'disqus_thread']
+  'comments',
+  'header',
+  'footer',
+  'sidebar',
+  'description',
+  'disqus_thread',
+  'jp-post-flair',  # More wordpress-isms from lackhand.wordpress.com.
+]
 
 class Entry(object):
   """Extracts the actual content of the post and removes all non-ebook
